@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나는 화를 잘 내는 사람인가?</title>
+<style>
+  body {
+    font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+    background: linear-gradient(135deg, #fff0f0, #ffeaea);
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 {
+    text-align: center;
+    color: #d24;
+    font-size: 1.8rem;
+  }
+  .question {
+    margin: 20px 0;
+    padding: 15px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    font-size: 0.95rem;
+  }
+  label { 
+    margin-right: 10px;
+    display: inline-block;
+    margin-top: 5px;
+  }
+  button {
+    display: block;
+    margin: 30px auto;
+    background: #ff5252;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  button:hover {
+    background: #e04141;
+    transform: scale(1.03);
+  }
+  #result {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1rem;
+  }
+  .gauge {
+    width: 90%;
+    height: 20px;
+    background: #ddd;
+    border-radius: 15px;
+    margin: 15px auto;
+    overflow: hidden;
+  }
+  .bar {
+    height: 100%;
+    width: 0;
+    border-radius: 15px;
+    transition: width 1s ease, background 0.5s ease;
+  }
+  .share-btn {
+    background: #1da1f2;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .share-btn.kakao { background: #fae100; color: #3c1e1e; }
+  .share-btn.copy { background: #444; }
+  .share-btn.save { background: #ff7043; }
+  .card {
+    width: 90%;
+    max-width: 340px;
+    margin: 25px auto;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .emoji { font-size: 2.8rem; }
+  @media (max-width: 500px) {
+    body { padding: 10px; }
+    h1 { font-size: 1.5rem; }
+    .question { font-size: 0.9rem; }
+    button { font-size: 0.9rem; padding: 10px 20px; }
+    .share-btn { font-size: 0.8rem; padding: 8px 15px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🔥 나는 화를 잘 내는 사람인가?</h1>
+<p style="text-align:center;">각 문항에 대해 자신의 반응 강도를 선택하세요<br>(1=아주 약함, 5=아주 강함)</p>
+
+<div id="quiz"></div>
+
+<button onclick="calculate()">결과 보기</button>
+
+<div id="result"></div>
+
+<!-- html2canvas for image capture -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+const questions = [
+  "친구가 약속에 30분 늦었다. '미안! 차가 막혀서'라고 할 때 나는?",
+  "카페에서 주문한 음료가 잘못 나왔다.",
+  "조별 과제에서 조원이 자료 조사를 아예 안 해왔다.",
+  "친구가 내 옷 스타일을 지적한다. '너 그거 좀 안 어울려.'",
+  "별로 안 친한 지인이 주말에 이사 좀 도와달라고 부탁한다.",
+  "단톡방에서 누군가 내 가치관과 안 맞는 얘기를 계속한다.",
+  "연인이 나와의 약속을 잊어버렸다.",
+  "나에 대한 오해(뒷담화)를 우연히 들었다.",
+  "내가 '화가 났다'는 걸 깨달았을 때, 가장 먼저 드는 생각은?",
+  "갈등이 (어떻게든) 끝난 후, 나는?"
+];
+
+const quizDiv = document.getElementById("quiz");
+
+questions.forEach((q, i) => {
+  let html = `<div class="question"><p><b>${i + 1}. ${q}</b></p>`;
+  for (let j = 1; j <= 5; j++) {
+    const labels = ["아주 약함", "약함", "보통", "강함", "아주 강함"];
+    html += `<label><input type="radio" name="q${i}" value="${j}"> ${j} (${labels[j-1]})</label>`;
+  }
+  html += "</div>";
+  quizDiv.innerHTML += html;
+});
+
+function calculate() {
+  let total = 0;
+  for (let i = 0; i < questions.length; i++) {
+    const val = document.querySelector(`input[name=q${i}]:checked`);
+    if (val) total += parseInt(val.value);
+    else {
+      alert(`${i + 1}번 문항에 답해주세요!`);
+      return;
+    }
+  }
+
+  const level = Math.max(10, Math.min(100, Math.round(total * 2)));
+
+  // 색상 변화 (파랑 → 주황 → 빨강)
+  const hue = Math.round(200 - (level * 1.5));
+  const barColor = `hsl(${hue}, 85%, 55%)`;
+
+  let msg = "", emoji = "";
+  if (level < 40) { msg = "감정을 속으로 삼키는 타입"; emoji = "🧊"; }
+  else if (level < 70) { msg = "상황에 따라 적절히 표현하는 타입"; emoji = "🌤"; }
+  else if (level < 90) { msg = "감정을 솔직하게 드러내는 타입"; emoji = "🔥"; }
+  else { msg = "참지 않고 즉각적으로 반응하는 타입"; emoji = "🌋"; }
+
+  const shareText = `🔥 나의 화내기 레벨은 ${level}! (${msg}) 👉 너도 테스트 해봐: https://example.com`;
+
+  document.getElementById("result").innerHTML = `
+    <div class="card" id="resultCard">
+      <div class="emoji">${emoji}</div>
+      <h2>당신의 화내기 레벨: ${level}</h2>
+      <div class="gauge"><div class="bar" style="width:${level}%; background:${barColor};"></div></div>
+      <p><b>${msg}</b></p>
+      <button class="share-btn" onclick="shareTwitter('${shareText}')">트위터 공유</button>
+      <button class="share-btn kakao" onclick="shareKakao('${shareText}')">카카오톡 공유</button>
+      <button class="share-btn copy" onclick="copyLink('${shareText}')">링크 복사</button>
+      <button class="share-btn save" onclick="saveImage()">이미지 저장하기 📸</button>
+    </div>
+  `;
+}
+
+function shareTwitter(text) {
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, "_blank");
+}
+
+function shareKakao(text) {
+  alert("카카오톡 공유는 실제 서버 연결 시 작동합니다 😊 (지금은 미리보기용)");
+}
+
+async function copyLink(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("✅ 결과 링크가 복사되었습니다!\n원하는 SNS나 메신저에 붙여넣어보세요.");
+  } catch (err) {
+    // 모바일 브라우저 대응 (execCommand 대체)
+    const temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("✅ 복사가 완료되었습니다!");
+  }
+}
+
+function saveImage() {
+  const card = document.getElementById("resultCard");
+  html2canvas(card, { scale: 2 }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = "화테스트결과.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  });
+}
+</script>
+</body>
+</html>
