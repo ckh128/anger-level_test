@@ -33,7 +33,7 @@
     display: inline-block;
     margin-top: 5px;
   }
-  button {
+  #submitBtn {
     display: block;
     margin: 30px auto;
     background: #ff5252;
@@ -45,7 +45,7 @@
     cursor: pointer;
     transition: 0.3s;
   }
-  button:hover {
+  #submitBtn:hover {
     background: #e04141;
     transform: scale(1.03);
   }
@@ -95,7 +95,7 @@
     body { padding: 10px; }
     h1 { font-size: 1.5rem; }
     .question { font-size: 0.9rem; }
-    button { font-size: 0.9rem; padding: 10px 20px; }
+    #submitBtn { font-size: 0.9rem; padding: 10px 20px; }
     .share-btn { font-size: 0.8rem; padding: 8px 15px; }
   }
 </style>
@@ -107,12 +107,19 @@
 
 <div id="quiz"></div>
 
-<button onclick="calculate()">결과 보기</button>
+<button id="submitBtn" onclick="calculate()">결과 보기</button>
 
 <div id="result"></div>
 
 <!-- html2canvas for image capture -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- Kakao SDK -->
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script>
+  Kakao.init("e769fc93830b8cb68c6d46ab2864f317");
+  console.log("✅ Kakao SDK 초기화:", Kakao.isInitialized());
+</script>
 
 <script>
 const questions = [
@@ -151,10 +158,9 @@ function calculate() {
     }
   }
 
-  // === 👉 추가된 부분 ===
+  // 🔥 문항 전체와 버튼 숨기기
   document.getElementById("quiz").style.display = "none";
-  document.querySelector("button").style.display = "none";
-  // ======================
+  document.getElementById("submitBtn").style.display = "none";
 
   const level = Math.max(10, Math.min(100, Math.round(total * 2)));
   const hue = Math.round(200 - (level * 1.5));
@@ -166,7 +172,7 @@ function calculate() {
   else if (level < 90) { msg = "감정을 솔직하게 드러내는 타입"; emoji = "🔥"; }
   else { msg = "참지 않고 즉각적으로 반응하는 타입"; emoji = "🌋"; }
 
-  const shareText = `🔥 나의 화내기 레벨은 ${level}! (${msg}) 👉 너도 테스트 해봐: https://example.com`;
+  const shareText = `🔥 나의 화내기 레벨은 ${level}! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
 
   document.getElementById("result").innerHTML = `
     <div class="card" id="resultCard">
@@ -188,7 +194,31 @@ function shareTwitter(text) {
 }
 
 function shareKakao(text) {
-  alert("카카오톡 공유는 실제 서버 연결 시 작동합니다 😊 (지금은 미리보기용)");
+  if (!Kakao.isInitialized()) {
+    alert("카카오 SDK가 초기화되지 않았습니다. 키를 확인하세요!");
+    return;
+  }
+  Kakao.Link.sendDefault({
+    objectType: 'feed',
+    content: {
+      title: '🔥 나의 화내기 레벨 테스트 결과',
+      description: text,
+      imageUrl: 'https://ckh128.github.io/anger-level_test/preview.png',
+      link: {
+        mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
+        webUrl: 'https://ckh128.github.io/anger-level_test/'
+      }
+    },
+    buttons: [
+      {
+        title: '나도 테스트하기',
+        link: {
+          mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
+          webUrl: 'https://ckh128.github.io/anger-level_test/'
+        }
+      }
+    ]
+  });
 }
 
 async function copyLink(text) {
