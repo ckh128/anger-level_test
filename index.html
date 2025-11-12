@@ -114,11 +114,11 @@
 <!-- html2canvas for image capture -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<!-- Kakao SDK -->
+<!-- ✅ Kakao SDK -->
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 <script>
   Kakao.init("e769fc93830b8cb68c6d46ab2864f317");
-  console.log("✅ Kakao SDK 초기화:", Kakao.isInitialized());
+  console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
 </script>
 
 <script>
@@ -158,7 +158,7 @@ function calculate() {
     }
   }
 
-  // 🔥 문항 전체와 버튼 숨기기
+  // 🔥 설문 숨기기
   document.getElementById("quiz").style.display = "none";
   document.getElementById("submitBtn").style.display = "none";
 
