@@ -151,9 +151,12 @@ function calculate() {
     }
   }
 
-  const level = Math.max(10, Math.min(100, Math.round(total * 2)));
+  // === 👉 추가된 부분 ===
+  document.getElementById("quiz").style.display = "none";
+  document.querySelector("button").style.display = "none";
+  // ======================
 
-  // 색상 변화 (파랑 → 주황 → 빨강)
+  const level = Math.max(10, Math.min(100, Math.round(total * 2)));
   const hue = Math.round(200 - (level * 1.5));
   const barColor = `hsl(${hue}, 85%, 55%)`;
 
@@ -193,7 +196,6 @@ async function copyLink(text) {
     await navigator.clipboard.writeText(text);
     alert("✅ 결과 링크가 복사되었습니다!\n원하는 SNS나 메신저에 붙여넣어보세요.");
   } catch (err) {
-    // 모바일 브라우저 대응 (execCommand 대체)
     const temp = document.createElement("textarea");
     temp.value = text;
     document.body.appendChild(temp);
