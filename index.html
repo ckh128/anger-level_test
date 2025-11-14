@@ -28,10 +28,9 @@
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     font-size: 0.95rem;
   }
-  /* (CSS 수정) 답변이 길어져서 한 줄씩 보이도록 수정 */
   label { 
-    display: block; /* 한 줄에 하나씩 보이도록 변경 */
-    margin: 8px 0; /* 위아래 여백 추가 */
+    display: block;
+    margin: 8px 0;
     padding: 8px;
     border-radius: 8px;
     background: #f9f9f9;
@@ -129,12 +128,11 @@
 
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 <script>
-  Kakao.init("e769fc93830b8cb68c6d46ab2864f317"); // 이 키는 본인의 키로 유지하세요
+  Kakao.init("e769fc93830b8cb68c6d46ab2864f317"); 
   console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
 </script>
 
 <script>
-// 1. 질문 6개로 축소
 const questions = [
   "친구가 약속에 30분 늦었다. '미안! 차가 막혀서'라고 할 때",
   "조별 과제에서 조원이 자료 조사를 아예 안 해왔다.",
@@ -145,145 +143,4 @@ const questions = [
 ];
 
 const quizDiv = document.getElementById("quiz");
-const MAX_SCORE_PER_QUESTION = 4; // 0-4점 척도 (총 5개)
-
-questions.forEach((q, i) => {
-  let html = `<div class="question"><p><b>${i + 1}. ${q}</b></p>`;
-  
-  // 2. 답변을 0-4점 '반응 강도'로 수정
-  const labels = [
-    "0점: 반응이 거의 없음 (속으로만 생각)",
-    "1점: 반응이 약함 (약간 티만 냄)",
-    "2점: 보통 (할 말은 함)",
-    "3점: 강함 (불쾌함을 확실히 표현)",
-    "4점: 아주 강함 (즉시, 강하게 화를 냄)"
-  ];
-
-  // 0부터 4까지 반복
-  for (let j = 0; j <= MAX_SCORE_PER_QUESTION; j++) {
-    html += `<label><input type="radio" name="q${i}" value="${j}"> ${labels[j]}</label>`;
-  }
-  html += "</div>";
-  quizDiv.innerHTML += html;
-});
-
-function calculate() {
-  let total_hwabyeong_score = 0; // 홧병 점수 (높을수록 안 좋음)
-  
-  for (let i = 0; i < questions.length; i++) {
-    const val_str = document.querySelector(`input[name=q${i}]:checked`);
-    if (val_str) {
-      const reaction_strength = parseInt(val_str.value); // 0~4 (사용자가 선택한 '반응 강도')
-
-      // 3. ⭐️ 핵심 로직: 점수 반전 (Invert)
-      // "반응이 강할수록(4점)" 홧병 점수는 0점이 되고,
-      // "반응이 약할수록(0점)" 홧병 점수는 4점이 됨.
-      const score_for_this_question = MAX_SCORE_PER_QUESTION - reaction_strength;
-      
-      total_hwabyeong_score += score_for_this_question;
-
-    } else {
-      alert(`${i + 1}번 문항에 답해주세요!`);
-      return;
-    }
-  }
-
-  document.getElementById("quiz").style.display = "none";
-  document.getElementById("submitBtn").style.display = "none";
-
-  // 4. ⭐️ 점수 계산 로직 (최대 24점)
-  // 홧병 점수 총점 (0~24점)을 0-100 스케일로 변환
-  const maxScore = questions.length * MAX_SCORE_PER_QUESTION; // 6 * 4 = 24
-  const level = Math.round((total_hwabyeong_score / maxScore) * 100);
-
-  const hue = Math.round(200 - (level * 1.5)); 
-  const barColor = `hsl(${hue}, 85%, 55%)`;
-
-  // 5. 결과 메시지 수정
-  let msg = "", emoji = "";
-  if (level < 40) { msg = "하고 싶은 말 다 하는 '사이다' 타입"; emoji = "🥤"; }
-  else if (level < 70) { msg = "필요할 땐 표현하는 '현명한' 타입"; emoji = "⚖️"; }
-  else if (level < 90) { msg = "속에 조금 쌓아두는 '답답이' 타입"; emoji = "😥"; }
-  else { msg = "속이 숯검댕이! 'K-홧병' 위험 타입"; emoji = "🌋"; }
-
-  // 6. 공유 텍스트 수정
-  const shareText = `🔥 나의 홧병 지수는 ${level}%! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
-
-  document.getElementById("result").innerHTML = `
-    <div class="card" id="resultCard">
-      <div class="emoji">${emoji}</div>
-      <h2>당신의 홧병 지수: ${level}%</h2>
-      <div class="gauge"><div class="bar" style="width:${level}%; background:${barColor};"></div></div>
-      <p><b>${msg}</b></p>
-      <button class="share-btn" onclick="shareTwitter('${shareText}')">트위터 공유</button>
-      <button class="share-btn kakao" onclick="shareKakao('${shareText}')">카카오톡 공유</button>
-      <button class="share-btn copy" onclick="copyLink('${shareText}')">링크 복사</button>
-      <button class="share-btn save" onclick="saveImage()">이미지 저장하기 📸</button>
-    </div>
-  `;
-}
-
-// --- (shareTwitter, shareKakao, copyLink, saveImage 함수는 변경 없음) ---
-
-function shareTwitter(text) {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-  window.open(url, "_blank");
-}
-
-function shareKakao(text) {
-  if (!Kakao.isInitialized()) {
-    alert("카카오 SDK가 초기화되지 않았습니다. 키를 확인하세요!");
-    return;
-  }
-  // 7. 카카오톡 공유 메시지 수정
-  Kakao.Link.sendDefault({
-    objectType: 'feed',
-    content: {
-      title: '🔥 홧병(화병) 지수 테스트 결과', // 제목 수정
-      description: text,
-      imageUrl: 'https://ckh128.github.io/anger-level_test/preview.png', 
-      link: {
-        mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
-        webUrl: 'https://ckh128.github.io/anger-level_test/'
-      }
-  T},
-    buttons: [
-      {
-        title: '나도 테스트하기',
-        link: {
-          mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
-          webUrl: 'https://ckh128.github.io/anger-level_test/'
-        }
-      }
-    ]
-  });
-}
-
-async function copyLink(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    alert("✅ 결과 링크가 복사되었습니다!\n원하는 SNS나 메신저에 붙여넣어보세요.");
-  } catch (err) {
-    const temp = document.createElement("textarea");
-    temp.value = text;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    document.body.removeChild(temp);
-    alert("✅ 복사가 완료되었습니다!");
-  }
-}
-
-function saveImage() {
-  const card = document.getElementById("resultCard");
-  // 8. 저장 이미지 파일명 수정
-  html2canvas(card, { scale: 2 }).then(canvas => {
-    const link = document.createElement("a");
-    link.download = "홧병지수_테스트결과.png"; // 파일명 수정
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  });
-}
-</script>
-</body>
-</html>
+const MAX_SCORE_PER_QUESTION = 4; //
