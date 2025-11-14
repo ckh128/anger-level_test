@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>홧병지수 테스트</title>
+
 <style>
   body {
     font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
@@ -100,55 +101,62 @@
   }
 </style>
 </head>
+
 <body>
 
-<h1>🔥 홧병지수 테스트</h1>
-<p style="text-align:center;">각 상황에 대해 자신이 외부로 표출하는 반응 강도를 선택하세요<br>(1=아주 강함, 5=아주 약함)</p>
+<h1>💥 홧병지수 테스트</h1>
+<p style="text-align:center;">각 상황에서 <b>겉으로 드러내는 반응의 강도</b>를 선택하세요<br>(1 = 강하게 표현, 5 = 거의 표현 안 함)</p>
 
 <div id="quiz"></div>
 
 <button id="submitBtn" onclick="calculate()">결과 보기</button>
-
 <div id="result"></div>
 
-<!-- html2canvas for image capture -->
+<!-- html2canvas -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-<!-- ✅ Kakao SDK -->
+<!-- Kakao SDK -->
 <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
 <script>
   Kakao.init("e769fc93830b8cb68c6d46ab2864f317");
-  console.log("✅ Kakao SDK 초기화 완료:", Kakao.isInitialized());
 </script>
 
 <script>
+// -----------------------------
+// 질문들 (너가 수정한 버전 그대로 써도 됨)
+// -----------------------------
 const questions = [
-  "친구가 약속에 30분 늦었다. '미안! 차가 막혀서'라고 할 때 나는?",
+  "친구가 약속에 30분 늦었는데 '미안! 차가 막혀서'라고 한다.",
   "카페에서 주문한 음료가 잘못 나왔다.",
-  "조별 과제에서 조원이 자료 조사를 아예 안 해왔다.",
-  "친구가 내 옷 스타일을 지적한다. '너 그거 좀 안 어울려.'",
-  "별로 안 친한 지인이 주말에 이사 좀 도와달라고 부탁한다.",
-  "단톡방에서 누군가 내 가치관과 안 맞는 얘기를 계속한다.",
-  "연인이 나와의 약속을 잊어버렸다.",
-  "나에 대한 오해(뒷담화)를 우연히 들었다.",
-  "업무/과제에서 내 의견이 타당한데도 계속 무시당한다.",
-  "가족/친구가 나를 위한다며 내 가치관과 다른 잔소리를 계속한다."
+  "조별과제에서 조원이 준비한 게 없다.",
+  "친구가 내 옷 스타일을 지적한다.",
+  "별로 안 친한 사람이 주말에 이사를 도와달라고 한다.",
+  "단톡방에서 불편한 말을 계속하는 사람이 있다.",
+  "연인이 중요한 약속을 잊어버렸다.",
+  "나에 대한 오해나 뒷말을 전해 들었다.",
+  "회의/과제에서 내 의견이 반복해서 무시된다.",
+  "가족/친구가 나를 위한다며 잔소리를 계속한다."
 ];
 
+// 질문 HTML 생성
 const quizDiv = document.getElementById("quiz");
 
 questions.forEach((q, i) => {
   let html = `<div class="question"><p><b>${i + 1}. ${q}</b></p>`;
   for (let j = 1; j <= 5; j++) {
-    const labels = ["아주 약함", "약함", "보통", "강함", "아주 강함"];
+    const labels = ["강하게 표현", "조금 강하게 표현", "보통", "조금 참음", "거의 표현 안함"];
     html += `<label><input type="radio" name="q${i}" value="${j}"> ${j} (${labels[j-1]})</label>`;
   }
   html += "</div>";
   quizDiv.innerHTML += html;
 });
 
+// -----------------------------
+// 결과 계산 (홧병지수 버전)
+// -----------------------------
 function calculate() {
   let total = 0;
+
   for (let i = 0; i < questions.length; i++) {
     const val = document.querySelector(`input[name=q${i}]:checked`);
     if (val) total += parseInt(val.value);
@@ -158,28 +166,41 @@ function calculate() {
     }
   }
 
-  // 🔥 설문 숨기기
+  // 설문 숨기기
   document.getElementById("quiz").style.display = "none";
   document.getElementById("submitBtn").style.display = "none";
 
+  // 점수(최대 100)
   const level = Math.max(10, Math.min(100, Math.round(total * 2)));
   const hue = Math.round(200 - (level * 1.5));
   const barColor = `hsl(${hue}, 85%, 55%)`;
 
   let msg = "", emoji = "";
-  if (level < 40) { msg = "감정을 속으로 삼키는 타입"; emoji = "🧊"; }
-  else if (level < 70) { msg = "상황에 따라 적절히 표현하는 타입"; emoji = "🌤"; }
-  else if (level < 90) { msg = "감정을 솔직하게 드러내는 타입"; emoji = "🔥"; }
-  else { msg = "참지 않고 즉각적으로 반응하는 타입"; emoji = "🌋"; }
 
-  const shareText = `🔥 나의 화내기 레벨은 ${level}! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
+  // 점수 높음 = 화를 못 내고 많이 참는 타입 (홧병지수 높음)
+  if (level < 40) {
+    msg = "감정을 건강하게 표현하는 편이에요.";
+    emoji = "🌤️";
+  } else if (level < 70) {
+    msg = "적당히 표현하고 적당히 참는 성향이에요.";
+    emoji = "⛅";
+  } else if (level < 90) {
+    msg = "화를 잘 못 내고 속에 쌓아두는 편이에요.";
+    emoji = "🔥";
+  } else {
+    msg = "감정을 거의 표현하지 않아 홧병이 심하게 누적되는 타입이에요.";
+    emoji = "🌋";
+  }
+
+  const shareText = `💥 나의 '홧병지수'는 ${level}! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
 
   document.getElementById("result").innerHTML = `
     <div class="card" id="resultCard">
       <div class="emoji">${emoji}</div>
-      <h2>당신의 화내기 레벨: ${level}</h2>
+      <h2>당신의 홧병지수: ${level}</h2>
       <div class="gauge"><div class="bar" style="width:${level}%; background:${barColor};"></div></div>
       <p><b>${msg}</b></p>
+
       <button class="share-btn" onclick="shareTwitter('${shareText}')">트위터 공유</button>
       <button class="share-btn kakao" onclick="shareKakao('${shareText}')">카카오톡 공유</button>
       <button class="share-btn copy" onclick="copyLink('${shareText}')">링크 복사</button>
@@ -188,6 +209,9 @@ function calculate() {
   `;
 }
 
+// -----------------------------
+// 공유 기능
+// -----------------------------
 function shareTwitter(text) {
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   window.open(url, "_blank");
@@ -195,13 +219,13 @@ function shareTwitter(text) {
 
 function shareKakao(text) {
   if (!Kakao.isInitialized()) {
-    alert("카카오 SDK가 초기화되지 않았습니다. 키를 확인하세요!");
+    alert("카카오 SDK 미초기화!");
     return;
   }
   Kakao.Link.sendDefault({
     objectType: 'feed',
     content: {
-      title: '🔥 나의 화내기 레벨 테스트 결과',
+      title: '💥 나의 홧병지수 테스트 결과',
       description: text,
       imageUrl: 'https://ckh128.github.io/anger-level_test/preview.png',
       link: {
@@ -211,7 +235,7 @@ function shareKakao(text) {
     },
     buttons: [
       {
-        title: '나도 테스트하기',
+        title: '테스트 해보기',
         link: {
           mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
           webUrl: 'https://ckh128.github.io/anger-level_test/'
@@ -224,7 +248,7 @@ function shareKakao(text) {
 async function copyLink(text) {
   try {
     await navigator.clipboard.writeText(text);
-    alert("✅ 결과 링크가 복사되었습니다!\n원하는 SNS나 메신저에 붙여넣어보세요.");
+    alert("🔗 결과 링크 복사 완료!");
   } catch (err) {
     const temp = document.createElement("textarea");
     temp.value = text;
@@ -232,7 +256,7 @@ async function copyLink(text) {
     temp.select();
     document.execCommand("copy");
     document.body.removeChild(temp);
-    alert("✅ 복사가 완료되었습니다!");
+    alert("🔗 복사가 완료되었습니다!");
   }
 }
 
@@ -240,11 +264,12 @@ function saveImage() {
   const card = document.getElementById("resultCard");
   html2canvas(card, { scale: 2 }).then(canvas => {
     const link = document.createElement("a");
-    link.download = "화테스트결과.png";
+    link.download = "홧병지수_결과.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   });
 }
 </script>
+
 </body>
 </html>
