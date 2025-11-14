@@ -109,7 +109,7 @@
 
 <div id="quiz"></div>
 
-<button id="submitBtn" onclick="calculate()">결과 보기</button>
+<button id="submitBtn">결과 보기</button>
 <div id="result"></div>
 
 <!-- html2canvas -->
@@ -123,7 +123,7 @@
 
 <script>
 // -----------------------------
-// 질문들
+// 질문
 // -----------------------------
 const questions = [
   "친구가 약속에 30분 늦었는데 '미안! 차가 막혀서'라고 한다.",
@@ -138,9 +138,7 @@ const questions = [
   "가족/친구가 나를 위한다며 잔소리를 계속한다."
 ];
 
-// 질문 HTML 생성
 const quizDiv = document.getElementById("quiz");
-
 questions.forEach((q, i) => {
   let html = `<div class="question"><p><b>${i + 1}. ${q}</b></p>`;
   for (let j = 1; j <= 5; j++) {
@@ -152,8 +150,10 @@ questions.forEach((q, i) => {
 });
 
 // -----------------------------
-// 결과 계산 (0~100 변환 반영)
+// 결과 계산
 // -----------------------------
+document.getElementById("submitBtn").addEventListener("click", calculate);
+
 function calculate() {
   let total = 0;
 
@@ -166,11 +166,9 @@ function calculate() {
     }
   }
 
-  // 숨기기
   document.getElementById("quiz").style.display = "none";
   document.getElementById("submitBtn").style.display = "none";
 
-  // ⭐ 0~100 스케일 변환
   let level = Math.round(((total - 10) / 40) * 100);
   level = Math.max(0, Math.min(100, level));
 
@@ -202,12 +200,29 @@ function calculate() {
       <div class="gauge"><div class="bar" style="width:${level}%; background:${barColor};"></div></div>
       <p><b>${msg}</b></p>
 
-      <button class="share-btn" onclick="shareTwitter('${shareText}')">트위터 공유</button>
-      <button class="share-btn kakao" onclick="shareKakao('${shareText}')">카카오톡 공유</button>
-      <button class="share-btn copy" onclick="copyLink('${shareText}')">링크 복사</button>
-      <button class="share-btn save" onclick="saveImage()">이미지 저장하기 📸</button>
+      <button id="btnTwitter" class="share-btn">트위터 공유</button>
+      <button id="btnKakao" class="share-btn kakao">카카오톡 공유</button>
+      <button id="btnCopy" class="share-btn copy">링크 복사</button>
+      <button id="btnSave" class="share-btn save">이미지 저장하기 📸</button>
     </div>
   `;
+
+  // 공유 버튼 이벤트 연결
+  document.getElementById("btnTwitter").addEventListener("click", () => {
+    shareTwitter(shareText);
+  });
+
+  document.getElementById("btnKakao").addEventListener("click", () => {
+    shareKakao(shareText);
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", () => {
+    copyLink(shareText);
+  });
+
+  document.getElementById("btnSave").addEventListener("click", () => {
+    saveImage();
+  });
 }
 
 // -----------------------------
@@ -220,22 +235,22 @@ function shareTwitter(text) {
 
 function shareKakao(text) {
   Kakao.Link.sendDefault({
-    objectType: 'feed',
+    objectType: "feed",
     content: {
-      title: '💥 나의 홧병지수 테스트 결과',
+      title: "💥 나의 홧병지수 테스트 결과",
       description: text,
-      imageUrl: 'https://ckh128.github.io/anger-level_test/preview.png',
+      imageUrl: "https://ckh128.github.io/anger-level_test/preview.png",
       link: {
-        mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
-        webUrl: 'https://ckh128.github.io/anger-level_test/'
+        mobileWebUrl: "https://ckh128.github.io/anger-level_test/",
+        webUrl: "https://ckh128.github.io/anger-level_test/"
       }
     },
     buttons: [
       {
-        title: '테스트 해보기',
+        title: "테스트 해보기",
         link: {
-          mobileWebUrl: 'https://ckh128.github.io/anger-level_test/',
-          webUrl: 'https://ckh128.github.io/anger-level_test/'
+          mobileWebUrl: "https://ckh128.github.io/anger-level_test/",
+          webUrl: "https://ckh128.github.io/anger-level_test/"
         }
       }
     ]
