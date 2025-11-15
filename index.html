@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>홧병지수 테스트</title>
+<title>화병지수 테스트</title>
 
 <style>
   body {
@@ -104,7 +104,7 @@
 
 <body>
 
-<h1>💥 홧병지수 테스트</h1>
+<h1>💥 화병지수 테스트</h1>
 <p style="text-align:center;">각 상황에서 <b>겉으로 드러내는 반응의 강도</b>를 선택하세요<br>(1 = 강하게 표현, 5 = 거의 표현 안 함)</p>
 
 <div id="quiz"></div>
@@ -187,16 +187,16 @@ function calculate() {
     msg = "화를 잘 못 내고 속에 쌓아두는 편이에요.";
     emoji = "🔥";
   } else {
-    msg = "감정을 거의 표현하지 않아 홧병이 심하게 누적되는 타입이에요.";
+    msg = "감정을 거의 표현하지 않아 화병이 심하게 누적되는 타입이에요.";
     emoji = "🌋";
   }
 
-  const shareText = `💥 나의 '홧병지수'는 ${level}! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
+  const shareText = `💥 나의 '화병지수'는 ${level}! (${msg}) 👉 너도 테스트 해봐: https://ckh128.github.io/anger-level_test/`;
 
   document.getElementById("result").innerHTML = `
     <div class="card" id="resultCard">
       <div class="emoji">${emoji}</div>
-      <h2>당신의 홧병지수: ${level}</h2>
+      <h2>당신의 화병지수: ${level}</h2>
       <div class="gauge"><div class="bar" style="width:${level}%; background:${barColor};"></div></div>
       <p><b>${msg}</b></p>
 
@@ -237,7 +237,7 @@ function shareKakao(text) {
   Kakao.Link.sendDefault({
     objectType: "feed",
     content: {
-      title: "💥 나의 홧병지수 테스트 결과",
+      title: "💥 나의 화병지수 테스트 결과",
       description: text,
       imageUrl: "https://ckh128.github.io/anger-level_test/preview.png",
       link: {
@@ -276,7 +276,7 @@ function saveImage() {
   const card = document.getElementById("resultCard");
   html2canvas(card, { scale: 2 }).then(canvas => {
     const link = document.createElement("a");
-    link.download = "홧병지수_결과.png";
+    link.download = "화병지수_결과.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
   });
@@ -285,3 +285,4 @@ function saveImage() {
 
 </body>
 </html>
+
